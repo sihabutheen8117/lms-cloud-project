@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI-Powered Library System</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+    }
+
+    .header {
+      background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+      padding: 30px;
+      text-align: center;
+      color: white;
+    }
+
+    .header h1 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .header p {
+      font-size: 1.1rem;
+      opacity: 0.9;
+      font-weight: 300;
+    }
+
+    .ai-badge {
+      display: inline-block;
+      background: rgba(255, 255, 255, 0.2);
+      padding: 5px 15px;
+      border-radius: 20px;
+      font-size: 0.9rem;
+      margin-top: 10px;
+    }
+
+    .content {
+      padding: 40px;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 30px;
+      border-bottom: 2px solid #e2e8f0;
+    }
+
+    .tab {
+      padding: 15px 25px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 1rem;
+      font-weight: 600;
+      color: #6b7280;
+      transition: all 0.3s ease;
+      border-bottom: 3px solid transparent;
+    }
+
+    .tab.active {
+      color: #4facfe;
+      border-bottom-color: #4facfe;
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    .upload-section {
+      background: #f8fafc;
+      border: 2px dashed #cbd5e0;
+      border-radius: 16px;
+      padding: 40px;
+      text-align: center;
+      margin-bottom: 40px;
+      transition: all 0.3s ease;
+    }
+
+    .upload-section:hover {
+      border-color: #4facfe;
+      background: #f0f9ff;
+    }
+
+    .file-input-wrapper {
+      position: relative;
+      display: inline-block;
+      margin-bottom: 20px;
+    }
+
+    .file-input {
+      position: absolute;
+      left: -9999px;
+      opacity: 0;
+    }
+
+    .file-input-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: #4facfe;
+      color: white;
+      padding: 15px 30px;
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(79, 172, 254, 0.4);
+    }
+
+    .file-input-label:hover {
+      background: #2563eb;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(79, 172, 254, 0.5);
+    }
+
+    .selected-file {
+      margin-top: 15px;
+      padding: 15px;
+      background: white;
+      border-radius: 10px;
+      border-left: 4px solid #10b981;
+      display: none;
+    }
+
+    .selected-file.show {
+      display: block;
+    }
+
+    .upload-btn {
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      color: white;
+      border: none;
+      padding: 15px 40px;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
+      display: none;
+    }
+
+    .upload-btn.show {
+      display: inline-block;
+    }
+
+    .upload-btn:hover:not(:disabled) {
+      background: linear-gradient(135deg, #059669 0%, #047857 100%);
+      transform: translateY(-2px);
+    }
+
+    .upload-btn:disabled {
+      background: #9ca3af;
+      cursor: not-allowed;
+    }
+
+    .ai-section {
+      background: white;
+      border-radius: 16px;
+      padding: 30px;
+      margin-bottom: 30px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    }
+
+    .ai-chat-container {
+      max-height: 400px;
+      overflow-y: auto;
+      margin-bottom: 20px;
+      padding: 20px;
+      background: #f8fafc;
+      border-radius: 12px;
+    }
+
+    .chat-message {
+      margin-bottom: 15px;
+      padding: 12px 18px;
+      border-radius: 12px;
+      max-width: 80%;
+    }
+
+    .chat-message.user {
+      background: #4facfe;
+      color: white;
+      margin-left: auto;
+    }
+
+    .chat-message.ai {
+      background: #e2e8f0;
+      color: #1f2937;
+    }
+
+    .ai-input-container {
+      display: flex;
+      gap: 10px;
+    }
+
+    .ai-input {
+      flex: 1;
+      padding: 15px;
+      border: 2px solid #e2e8f0;
+      border-radius: 12px;
+      font-size: 1rem;
+    }
+
+    .ai-input:focus {
+      outline: none;
+      border-color: #4facfe;
+    }
+
+    .ai-btn {
+      background: #4facfe;
+      color: white;
+      border: none;
+      padding: 15px 30px;
+      border-radius: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .ai-btn:hover:not(:disabled) {
+      background: #2563eb;
+    }
+
+    .ai-btn:disabled {
+      background: #9ca3af;
+      cursor: not-allowed;
+    }
+
+    .files-section {
+      background: white;
+      border-radius: 16px;
+      padding: 30px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    }
+
+    .files-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 20px;
+    }
+
+    .file-item {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 20px;
+      transition: all 0.3s ease;
+    }
+
+    .file-item:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
+      border-color: #4facfe;
+    }
+
+    .ai-features {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+
+    .ai-feature-card {
+      background: white;
+      border-radius: 12px;
+      padding: 25px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+      transition: all 0.3s ease;
+    }
+
+    .ai-feature-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
+    }
+
+    .ai-feature-card h3 {
+      color: #1f2937;
+      margin-bottom: 10px;
+      font-size: 1.2rem;
+    }
+
+    .ai-feature-card p {
+      color: #6b7280;
+      line-height: 1.6;
+    }
+
+    .notification {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 15px 20px;
+      border-radius: 10px;
+      color: white;
+      font-weight: 600;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+      transform: translateX(400px);
+      transition: transform 0.3s ease;
+      z-index: 1000;
+    }
+
+    .notification.show {
+      transform: translateX(0);
+    }
+
+    .notification.success {
+      background: linear-gradient(135deg, #10b981, #059669);
+    }
+
+    .notification.error {
+      background: linear-gradient(135deg, #ef4444, #dc2626);
+    }
+
+    @media (max-width: 768px) {
+      .content {
+        padding: 20px;
+      }
+      .tabs {
+        flex-wrap: wrap;
+      }
+      .ai-features {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>🤖 AI-Powered Library System</h1>
+      <p>Smart document management with Azure OpenAI</p>
+      <span class="ai-badge">✨ GenAI Enhanced</span>
+    </div>
+    
+    <div class="content">
+      <div class="tabs">
+        <button class="tab active" onclick="switchTab('upload')">📚 Upload Books</button>
+        <button class="tab" onclick="switchTab('chat')">💬 AI Assistant</button>
+        <button class="tab" onclick="switchTab('analyze')">📊 AI Analysis</button>
+        <button class="tab" onclick="switchTab('files')">📁 My Library</button>
+      </div>
+
+      <!-- Upload Tab -->
+      <div id="upload-tab" class="tab-content active">
+        <div class="upload-section">
+          <div class="file-input-wrapper">
+            <input type="file" id="fileInput" class="file-input">
+            <label for="fileInput" class="file-input-label">
+              <svg style="width:20px;height:20px" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+              </svg>
+              Choose File
+            </label>
+          </div>
+          
+          <p style="color: #6b7280; margin-bottom: 20px;">Upload your books, PDFs, or documents</p>
+          
+          <div class="selected-file">
+            <div class="selected-file-name"></div>
+            <div class="selected-file-size"></div>
+          </div>
+          
+          <button class="upload-btn" onclick="uploadFile()">Upload File</button>
+        </div>
+      </div>
+
+      <!-- AI Chat Tab -->
+      <div id="chat-tab" class="tab-content">
+        <div class="ai-section">
+          <h2 style="margin-bottom: 20px;">💬 Library AI Assistant</h2>
+          <p style="color: #6b7280; margin-bottom: 20px;">Ask questions about your library, get book recommendations, or search for specific topics</p>
+          
+          <div class="ai-chat-container" id="chatContainer">
+            <div class="chat-message ai">
+              Hi! I'm your AI library assistant. I can help you find books, answer questions about your collection, or provide recommendations. What would you like to know?
+            </div>
+          </div>
+          
+          <div class="ai-input-container">
+            <input type="text" id="chatInput" class="ai-input" placeholder="Ask me anything about your library..." onkeypress="handleChatKeypress(event)">
+            <button class="ai-btn" onclick="sendChatMessage()">Send</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- AI Analysis Tab -->
+      <div id="analyze-tab" class="tab-content">
+        <h2 style="margin-bottom: 20px;">📊 AI-Powered Analysis</h2>
+        
+        <div class="ai-features">
+          <div class="ai-feature-card">
+            <h3>📖 Book Summarization</h3>
+            <p>Get quick summaries of your uploaded documents using Azure OpenAI</p>
+            <button class="ai-btn" style="margin-top: 15px; width: 100%;" onclick="showFeature('summarize')">Try Now</button>
+          </div>
+          
+          <div class="ai-feature-card">
+            <h3>🔍 Smart Search</h3>
+            <p>Semantic search across your entire library using AI embeddings</p>
+            <button class="ai-btn" style="margin-top: 15px; width: 100%;" onclick="showFeature('search')">Search</button>
+          </div>
+          
+          <div class="ai-feature-card">
+            <h3>⭐ Sentiment Analysis</h3>
+            <p>Analyze feedback and reviews with Azure Text Analytics</p>
+            <button class="ai-btn" style="margin-top: 15px; width: 100%;" onclick="showFeature('sentiment')">Analyze</button>
+          </div>
+        </div>
+
+        <div id="feature-output" class="ai-section" style="display: none;">
+          <h3 id="feature-title">Results</h3>
+          <div id="feature-content" style="padding: 20px; background: #f8fafc; border-radius: 12px; margin-top: 15px;"></div>
+        </div>
+      </div>
+
+      <!-- Files Tab -->
+      <div id="files-tab" class="tab-content">
+        <div class="files-section">
+          <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 25px;">
+            <h3 style="font-size: 1.5rem; color: #1f2937; font-weight: 700;">My Books</h3>
+            <span class="files-count" style="background: #4facfe; color: white; padding: 5px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 600;">0</span>
+          </div>
+          <div class="files-grid" id="blobList"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { BlobServiceClient } from "https://cdn.jsdelivr.net/npm/@azure/storage-blob@12.15.0/+esm";
+
+    // Azure Configuration
+    const blobSasUrl = "https://library1.blob.core.windows.net/?sv=2024-11-04&ss=bfqt&srt=sco&sp=rwdlacupiytfx&se=2026-10-10T23:35:50Z&st=2025-10-10T15:20:50Z&spr=https&sig=zZRZ5578lnUYl8NV1SJkpq6rf1tQpRoLyvzK9%2FMe%2BoI%3D";
+    const containerName = "books";
+    
+
+    const blobServiceClient = new BlobServiceClient(blobSasUrl);
+    const containerClient = blobServiceClient.getContainerClient(containerName);
+
+    let selectedFile = null;
+    let chatHistory = [];
+
+    
+
+    // Tab switching
+    window.switchTab = function(tabName) {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      
+      event.target.classList.add('active');
+      document.getElementById(tabName + '-tab').classList.add('active');
+    };
+
+    // File handling
+    document.getElementById("fileInput").addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (file) {
+        selectedFile = file;
+        showSelectedFile(file);
+      }
+    });
+
+    function showSelectedFile(file) {
+      document.querySelector('.selected-file-name').textContent = file.name;
+      document.querySelector('.selected-file-size').textContent = formatFileSize(file.size);
+      document.querySelector('.selected-file').classList.add('show');
+      document.querySelector('.upload-btn').classList.add('show');
+    }
+
+    function formatFileSize(bytes) {
+      if (bytes === 0) return '0 Bytes';
+      const k = 1024;
+      const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+      const i = Math.floor(Math.log(bytes) / Math.log(k));
+      return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+
+    function showNotification(message, type = 'success') {
+      document.querySelectorAll('.notification').forEach(n => n.remove());
+      
+      const notification = document.createElement('div');
+      notification.className = `notification ${type}`;
+      notification.textContent = message;
+      document.body.appendChild(notification);
+      
+      setTimeout(() => notification.classList.add('show'), 100);
+      setTimeout(() => {
+        notification.classList.remove('show');
+        setTimeout(() => notification.remove(), 300);
+      }, 3000);
+    }
+
+    // Upload function
+    window.uploadFile = async function() {
+      if (!selectedFile) {
+        showNotification("Please select a file first.", 'error');
+        return;
+      }
+
+      const uploadBtn = document.querySelector('.upload-btn');
+      uploadBtn.disabled = true;
+      uploadBtn.textContent = 'Uploading...';
+
+      try {
+        const blockBlobClient = containerClient.getBlockBlobClient(selectedFile.name);
+        await blockBlobClient.uploadBrowserData(selectedFile);
+        
+        showNotification(`✅ ${selectedFile.name} uploaded successfully!`);
+        
+        document.getElementById("fileInput").value = '';
+        document.querySelector('.selected-file').classList.remove('show');
+        uploadBtn.classList.remove('show');
+        selectedFile = null;
+        
+        listBlobs();
+      } catch (err) {
+        console.error("Upload error:", err.message);
+        showNotification("❌ Upload failed: " + err.message, 'error');
+      } finally {
+        uploadBtn.disabled = false;
+        uploadBtn.textContent = 'Upload File';
+      }
+    };
+
+    // List blobs
+    async function listBlobs() {
+      const listDiv = document.getElementById("blobList");
+      const filesCount = document.querySelector('.files-count');
+      
+      try {
+        const blobs = [];
+        for await (const blob of containerClient.listBlobsFlat()) {
+          blobs.push(blob);
+        }
+        
+        filesCount.textContent = blobs.length;
+        
+        if (blobs.length === 0) {
+          listDiv.innerHTML = '<div style="text-align: center; padding: 60px; color: #6b7280;"><h3>No files yet</h3><p>Upload your first book to get started</p></div>';
+          return;
+        }
+        
+        const filesHTML = blobs.map(blob => {
+          const blobUrl = `${containerClient.url}/${blob.name}`;
+          const uploadDate = blob.properties.lastModified 
+            ? new Date(blob.properties.lastModified).toLocaleDateString()
+            : 'Unknown';
+          
+          return `
+            <div class="file-item">
+              <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
+                <div style="width: 40px; height: 40px; background: #4facfe; border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+                  <svg width="24" height="24" fill="white" viewBox="0 0 24 24">
+                    <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
+                  </svg>
+                </div>
+                <div style="flex: 1;">
+                  <h4 style="color: #1f2937; font-weight: 600; margin-bottom: 5px;">${blob.name}</h4>
+                  <div style="color: #6b7280; font-size: 0.85rem;">${formatFileSize(blob.properties.contentLength)} • ${uploadDate}</div>
+                </div>
+              </div>
+              <a href="${blobUrl}" target="_blank" style="display: block; background: #4facfe; color: white; text-decoration: none; padding: 10px; border-radius: 8px; text-align: center; font-weight: 600; transition: all 0.3s ease;">Open File</a>
+            </div>
+          `;
+        }).join('');
+        
+        listDiv.innerHTML = filesHTML;
+      } catch (err) {
+        console.error("List error:", err.message);
+        showNotification("Failed to load files", 'error');
+      }
+    }
+
+    // AI Chat functionality
+    window.handleChatKeypress = function(event) {
+      if (event.key === 'Enter') {
+        sendChatMessage();
+      }
+    };
+
+    window.sendChatMessage = async function() {
+      const input = document.getElementById('chatInput');
+      const message = input.value.trim();
+      
+      if (!message) return;
+      
+      const chatContainer = document.getElementById('chatContainer');
+      
+      // Add user message
+      const userMsg = document.createElement('div');
+      userMsg.className = 'chat-message user';
+      userMsg.textContent = message;
+      chatContainer.appendChild(userMsg);
+      
+      input.value = '';
+      input.disabled = true;
+      
+      // Simulate AI response (Replace with actual Azure OpenAI call)
+      const aiMsg = document.createElement('div');
+      aiMsg.className = 'chat-message ai';
+      aiMsg.textContent = 'Processing your request...';
+      chatContainer.appendChild(aiMsg);
+      
+      chatContainer.scrollTop = chatContainer.scrollHeight;
+      
+      try {
+        const response = await callAzureOpenAI(message);
+        aiMsg.textContent = response;
+      } catch (err) {
+        aiMsg.textContent = 'I apologize, but I encountered an error. Please try again.';
+      }
+      
+      input.disabled = false;
+      chatContainer.scrollTop = chatContainer.scrollHeight;
+    };
+
+    // Azure OpenAI API call
+    async function callAzureOpenAI(userMessage) {
+
+        const res = await fetch("http://localhost:3000/generate", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ userMessage })
+        });
+        const data = await res.json();
+        console.log(data)
+        return data.response;
+
+    //     const response = await fetch(`https://api-inference.huggingface.co/models/${HF_MODEL}`, {
+    //         method: "POST",
+    //         headers: {
+    //             "Content-Type": "application/json",
+    //             "Authorization": `Bearer ${HF_KEY}`,
+    //         },
+    //         body: JSON.stringify({ inputs: prompt }),
+    //     });
+
+    //     const data = await response.json();
+
+    //     console.log(data);
+    //     return data[0]?.generated_text || "No response";
+
+    //   // Mock response for demo
+    //   const mockResponses = [
+    //     "Based on your library, I recommend checking out the latest uploads in the science fiction section.",
+    //     "I found several books related to your query. Would you like me to provide summaries?",
+    //     "Your library currently contains books across multiple genres. The most recent additions are in the technology category.",
+    //     "I can help you organize your collection by topic, author, or date. What would you prefer?"
+    //   ];
+      
+    //   await new Promise(resolve => setTimeout(resolve, 1500));
+    //   return mockResponses[Math.floor(Math.random() * mockResponses.length)];
+      
+      // Actual implementation (uncomment and configure):
+      /*
+      const response = await fetch(`${OPENAI_ENDPOINT}/openai/deployments/${DEPLOYMENT_NAME}/chat/completions?api-version=2023-05-15`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'api-key': OPENAI_KEY
+        },
+        body: JSON.stringify({
+          messages: [
+            { role: 'system', content: 'You are a helpful library assistant.' },
+            { role: 'user', content: userMessage }
+          ],
+          max_tokens: 500
+        })
+      });
+      
+      const data = await response.json();
+      return data.choices[0].message.content;
+      */
+    }
+
+    // AI Features
+    window.showFeature = async function(feature) {
+      const output = document.getElementById('feature-output');
+      const title = document.getElementById('feature-title');
+      const content = document.getElementById('feature-content');
+      
+      output.style.display = 'block';
+      
+      switch(feature) {
+        case 'summarize':
+          title.textContent = '📖 Book Summary';
+          content.innerHTML = '<p style="color: #6b7280;">Analyzing your latest upload...</p>';
+          await new Promise(r => setTimeout(r, 1500));
+          content.innerHTML = '<p><strong>Summary:</strong> This document covers key concepts in cloud computing, including infrastructure automation, containerization strategies, and AI integration patterns. It provides practical examples and best practices for modern application deployment.</p>';
+          break;
+        case 'search':
+          title.textContent = '🔍 Semantic Search Results';
+          content.innerHTML = '<input type="text" placeholder="Search your library..." style="width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 8px; margin-bottom: 15px;"><p style="color: #6b7280;">Found 5 relevant documents matching your search criteria.</p>';
+          break;
+        case 'sentiment':
+          title.textContent = '⭐ Sentiment Analysis';
+          content.innerHTML = '<p><strong>Overall Sentiment:</strong> Positive (87%)</p><p style="margin-top: 10px; color: #6b7280;">Analysis based on reader feedback and reviews shows high satisfaction with the content quality and organization.</p>';
+          break;
+      }
+    };
+
+    // Initial load
+    listBlobs();
+  </script>
+</body>
+</html>
