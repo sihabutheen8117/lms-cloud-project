@@ -34,7 +34,7 @@ jobs:
         docker push ${{ secrets.ACR_NAME }}.azurecr.io/lms:latest
 
     - name: Deploy to Azure App Service
-      uses: azure/webapps-container-deploy@v2
+      uses: azure/webapps-container-deploy@v1
       with:
         app-name: ${{ secrets.APP_NAME }}
         images: ${{ secrets.ACR_NAME }}.azurecr.io/lms:latest
