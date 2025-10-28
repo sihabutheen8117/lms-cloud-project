@@ -1,40 +1,37 @@
-name: LMS CI/CD
+name: Build and Deploy to Azure Web App - Container
 
 on:
   push:
     branches:
       - main
 
-permissions:
-  contents: read
-
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: Log in to Azure
-      uses: azure/login@v1
-      with:
-        creds: ${{ secrets.AZURE_CREDENTIALS }}
+      - name: Log in to Azure
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-    - name: Build Docker image
-      run: |
-        docker build -t ${{ secrets.ACR_NAME }}.azurecr.io/lms:latest ./library-management-system
+      - name: Build Docker image
+        run: |
+          docker build -t mycontainerregistry.azurecr.io/library-management-system:latest ./library-management-system
 
-    - name: Log in to ACR
-      run: |
-        az acr login --name ${{ secrets.ACR_NAME }}
+      - name: Log in to Azure Container Registry
+        run: |
+          az acr login --name mycontainerregistry
 
-    - name: Push Docker image
-      run: |
-        docker push ${{ secrets.ACR_NAME }}.azurecr.io/lms:latest
+      - name: Push Docker image to ACR
+        run: |
+          docker push mycontainerregistry.azurecr.io/library-management-system:latest
 
-    - name: Deploy to Azure Web App
-      uses: azure/webapps-container-deploy@v1
-      with:
-        app-name: ${{ secrets.APP_NAME }}
-        images: ${{ secrets.ACR_NAME }}.azurecr.io/lms:latest
+      - name: Deploy to Azure Web App
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: "your-azure-webapp-name"
+          images: "mycontainerregistry.azurecr.io/library-management-system:latest"
