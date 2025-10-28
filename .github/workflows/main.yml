@@ -1,37 +1,46 @@
-name: Build and Deploy to Azure Web App - Container
+name: LMS CI/CD
 
 on:
   push:
     branches:
       - main
 
+permissions:
+  contents: read
+
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+    # Step 1 - Checkout code
+    - name: Checkout code
+      uses: actions/checkout@v3
 
-      - name: Log in to Azure
-        uses: azure/login@v1
-        with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
+    # Step 2 - Log in to Azure using client secret JSON
+    - name: Log in to Azure
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      - name: Build Docker image
-        run: |
-          docker build -t mycontainerregistry.azurecr.io/library-management-system:latest ./library-management-system
+    # Step 3 - Build Docker image (Dockerfile inside 'library-management-system/')
+    - name: Build Docker image
+      run: |
+        docker build -t ${{ secrets.ACR_NAME }}.azurecr.io/lms:latest ./library-management-system
 
-      - name: Log in to Azure Container Registry
-        run: |
-          az acr login --name mycontainerregistry
+    # Step 4 - Log in to Azure Container Registry
+    - name: Log in to ACR
+      run: |
+        az acr login --name ${{ secrets.ACR_NAME }}
 
-      - name: Push Docker image to ACR
-        run: |
-          docker push mycontainerregistry.azurecr.io/library-management-system:latest
+    # Step 5 - Push Docker image to ACR
+    - name: Push Docker image
+      run: |
+        docker push ${{ secrets.ACR_NAME }}.azurecr.io/lms:latest
 
-      - name: Deploy to Azure Web App
-        uses: azure/webapps-deploy@v2
-        with:
-          app-name: "your-azure-webapp-name"
-          images: "mycontainerregistry.azurecr.io/library-management-system:latest"
+    # Step 6 - Deploy to Azure Web App for Containers
+    - name: Deploy to Azure Web App
+      uses: azure/webapps-deploy@v2
+      with:
+        app-name: ${{ secrets.APP_NAME }}
+        images: ${{ secrets.ACR_NAME }}.azurecr.io/lms:latest
