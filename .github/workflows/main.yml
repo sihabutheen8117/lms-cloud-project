@@ -23,7 +23,7 @@ jobs:
 
     - name: Build Docker image
       run: |
-        docker build -t ${{ secrets.ACR_NAME }}.azurecr.io/lms:latest .
+        docker build -t ${{ secrets.ACR_NAME }}.azurecr.io/lms:latest ./library-management-system
 
     - name: Log in to ACR
       run: |
@@ -34,13 +34,6 @@ jobs:
         docker push ${{ secrets.ACR_NAME }}.azurecr.io/lms:latest
 
     - name: Deploy to Azure Web App
-      uses: azure/webapps-container-deploy@v1
-      with:
-        app-name: ${{ secrets.APP_NAME }}
-        images: ${{ secrets.ACR_NAME }}.azurecr.io/lms:latest
-
-
-    - name: Deploy to Azure App Service
       uses: azure/webapps-container-deploy@v1
       with:
         app-name: ${{ secrets.APP_NAME }}
