@@ -38,9 +38,17 @@ jobs:
       run: |
         docker push lmsacr001.azurecr.io/lms:latest
 
-    # Step 6 - Deploy to Azure Web App for Containers
-    - name: Deploy to Azure Web App
-      uses: azure/webapps-deploy@v2
-      with:
-        app-name: lms-app
-        images: lmsacr001.azurecr.io/lms:latest
+    # Step 6 - Deploy to Azure Container App
+    # - name: Deploy to Azure Web App
+    #   uses: azure/webapps-deploy@v2
+    #   with:
+    #     app-name: lms-app
+    #     images: lmsacr001.azurecr.io/lms:latest
+
+    - name: Deploy to Azure Container App
+      run: |
+        az containerapp update \
+          --name lms123 \
+          --resource-group LIB1 \
+          --image ${{ secrets.ACR_NAME }}.azurecr.io/lms:latest \
+          --registry-server ${{ secrets.ACR_NAME }}.azurecr.io
