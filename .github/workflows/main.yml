@@ -50,9 +50,21 @@ jobs:
     #       --password ${{ secrets.ACR_PASSWORD }}
 
     # Step 7 - Deploy updated image to Azure Container App
-    - name: Deploy updated image
+    # - name: Deploy updated image
+    #   run: |
+    #     az container update \
+    #       --name lms-app \
+    #       --resource-group LIB1 \
+    #       --image lmsacr001.azurecr.io/lms:latest
+
+    - name: Deploy updated image to Container Instance
       run: |
-        az container update \
-          --name lms-app \
+        az container create \
           --resource-group LIB1 \
-          --image lmsacr001.azurecr.io/lms:latest
+          --name lms-app \
+          --image lmsacr001.azurecr.io/lms:latest \
+          --registry-login-server lmsacr001.azurecr.io \
+          --registry-username ${{ secrets.ACR_USERNAME }} \
+          --registry-password ${{ secrets.ACR_PASSWORD }} \
+          --dns-name-label lms-app-unique \
+          --ports 80
