@@ -53,6 +53,6 @@ jobs:
     - name: Deploy updated image
       run: |
         az containerapp update \
-          --name lms123 \
+          --name lms-app \
           --resource-group LIB1 \
           --image lmsacr001.azurecr.io/lms:latest
