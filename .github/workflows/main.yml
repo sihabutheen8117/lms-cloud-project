@@ -52,7 +52,7 @@ jobs:
     # Step 7 - Deploy updated image to Azure Container App
     - name: Deploy updated image
       run: |
-        az containerapp update \
+        az container update \
           --name lms-app \
           --resource-group LIB1 \
           --image lmsacr001.azurecr.io/lms:latest
