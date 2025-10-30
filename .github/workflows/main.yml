@@ -40,14 +40,14 @@ jobs:
 
     # Step 6 - (One-time) Link ACR to your Container App environment
     # You can safely keep this in workflow; it will simply overwrite credentials if already linked.
-    - name: Link ACR with Container App
-      run: |
-        az containerapp registry set \
-          --name lms123 \
-          --resource-group LIB1 \
-          --server lmsacr001.azurecr.io \
-          --username ${{ secrets.ACR_USERNAME }} \
-          --password ${{ secrets.ACR_PASSWORD }}
+    # - name: Link ACR with Container App
+    #   run: |
+    #     az containerapp registry set \
+    #       --name lms123 \
+    #       --resource-group LIB1 \
+    #       --server lmsacr001.azurecr.io \
+    #       --username ${{ secrets.ACR_USERNAME }} \
+    #       --password ${{ secrets.ACR_PASSWORD }}
 
     # Step 7 - Deploy updated image to Azure Container App
     - name: Deploy updated image
