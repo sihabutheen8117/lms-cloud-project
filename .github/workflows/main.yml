@@ -26,21 +26,21 @@ jobs:
     # Step 3 - Build Docker image (Dockerfile inside 'library-management-system/')
     - name: Build Docker image
       run: |
-        docker build -t ${{ secrets.ACR_NAME }}.azurecr.io/lms:latest ./library-management-system
+        docker build -t lmsacr001.azurecr.io/lms:latest ./library-management-system
 
     # Step 4 - Log in to Azure Container Registry
     - name: Log in to ACR
       run: |
-        az acr login --name ${{ secrets.ACR_NAME }}
+        az acr login --name lmsacr001
 
     # Step 5 - Push Docker image to ACR
     - name: Push Docker image
       run: |
-        docker push ${{ secrets.ACR_NAME }}.azurecr.io/lms:latest
+        docker push lmsacr001.azurecr.io/lms:latest
 
     # Step 6 - Deploy to Azure Web App for Containers
     - name: Deploy to Azure Web App
       uses: azure/webapps-deploy@v2
       with:
-        app-name: ${{ secrets.APP_NAME }}
-        images: ${{ secrets.ACR_NAME }}.azurecr.io/lms:latest
+        app-name: lms-app
+        images: lmsacr001.azurecr.io/lms:latest
